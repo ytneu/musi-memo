@@ -111,21 +111,38 @@ const UserScreen = () => {
   const greetingText = `Hello ${username}`;
   const collectDateText = 'Collecting data: ';
 
-  const getPages = () => {
+  const getPages = async () => {
     if (from && to) {
       const url = GET_RECENT_TRACKS_ENDPOINT(getUser(), from, to);
       console.log(url);
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
+          console.log(data.recenttracks['@attr'].totalPages);
           setPages(data.recenttracks['@attr'].totalPages);
         });
     }
   };
 
   const parseData = (fetchData) => {
-    console.log(data.at(-1));
-    setData((prevState) => [...prevState, fetchData]);
+    // const data = data.concat(fetchData);
+    // data.concat()
+
+    let newData = [];
+
+    for (let i = fetchData.length - 1; i >= 0; i--) {
+      newData.push({
+        key: toString(i),
+        artist: fetchData[i].artist['#text'],
+        name: fetchData[i].name,
+        date: fetchData[i].date['#text'],
+        image: fetchData[i].image[0]['#text'],
+      });
+    }
+
+    console.log('new data', newData)
+
+    setData([...data, newData]);
   };
 
   const getOnePage = (page) => {
@@ -142,7 +159,7 @@ const UserScreen = () => {
 
   const getData = () => {
     for (let i = 0; i < pages; i++) {
-      getOnePage(pages[i]);
+      getOnePage(pages[i + 1]);
     }
   };
 
@@ -171,9 +188,8 @@ const UserScreen = () => {
   };
 
   useEffect(() => {
-    getOnePageData();
-    // getPages();
-    // getData();
+    // getOnePageData();
+    getPages().then(getData());
   }, [from, to]);
 
   const setDate = (v) => {
