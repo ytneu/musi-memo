@@ -132,7 +132,7 @@ const UserScreen = () => {
 
     for (let i = fetchData.length - 1; i >= 0; i--) {
       newData.push({
-        key: toString(i),
+        key: toString(data.length+i),
         artist: fetchData[i].artist['#text'],
         name: fetchData[i].name,
         date: fetchData[i].date['#text'],
@@ -140,9 +140,11 @@ const UserScreen = () => {
       });
     }
 
-    console.log('new data', newData)
+    // console.log('new data', newData)
 
-    setData([...data, newData]);
+      const localData = data.concat(newData)
+      setData(localData);
+    
   };
 
   const getOnePage = (page) => {
@@ -154,13 +156,15 @@ const UserScreen = () => {
         // console.log(data);
         // console.log(data.recenttracks.track);
         parseData(data.recenttracks.track);
+        // console.log(data.recenttracks.track)
       });
   };
 
   const getData = () => {
-    for (let i = 0; i < pages; i++) {
-      getOnePage(pages[i + 1]);
-    }
+    setData([]);
+      for (let i = 0; i < pages; i++) {
+        getOnePage(i+1);
+      }
   };
 
   const getOnePageData = () => {
@@ -189,7 +193,7 @@ const UserScreen = () => {
 
   useEffect(() => {
     // getOnePageData();
-    getPages().then(getData());
+    getPages().then(() => getData());
   }, [from, to]);
 
   const setDate = (v) => {
@@ -229,7 +233,9 @@ const UserScreen = () => {
         </Button>
       </ButtonContainer>
       <SpotifyAuthButton />
-      <DataContainer>
+      {data ? data.length : null}
+      
+      {/* <DataContainer>
         {isLoading && <Spin />}
         {from && to && (
           <TextDateContainer>
@@ -238,10 +244,9 @@ const UserScreen = () => {
           </TextDateContainer>
         )}
         <ResultContainer>
-          {/* {from && to && <span>{pages}</span>} */}
-          <Table dataSource={data} columns={columns} />
+          <Table dataSource={data} columns={columns} /> 
         </ResultContainer>
-      </DataContainer>
+      </DataContainer> */}
     </Container>
   );
 };
