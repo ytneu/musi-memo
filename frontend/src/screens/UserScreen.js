@@ -7,6 +7,8 @@ import moment from 'moment';
 import { GET_RECENT_TRACKS_ENDPOINT } from '../consts/ApiUrls';
 import SpotifyAuthButton from '../components/SpotifyAuthButton';
 
+import axios from 'axios';
+
 const Container = styled.div``;
 
 const GreetingContainer = styled.div`
@@ -54,21 +56,6 @@ const { RangePicker } = DatePicker;
 
 const dateFormat = 'YYYY/MM/DD';
 
-const dataSource = [
-  {
-    key: '1',
-    artist: 'Mike',
-    name: 32,
-    date: '07 Dec 2021, 14:45',
-  },
-  {
-    key: '2',
-    artist: 'John',
-    name: 42,
-    date: '08 Dec 2021, 14:45',
-  },
-];
-
 const columns = [
   {
     title: 'Image',
@@ -114,101 +101,55 @@ const UserScreen = () => {
   const getPages = async () => {
     if (from && to) {
       const url = GET_RECENT_TRACKS_ENDPOINT(getUser(), from, to);
-      console.log(url);
-      fetch(url)
+      return fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data.recenttracks['@attr'].totalPages);
-          setPages(data.recenttracks['@attr'].totalPages);
+          return data.recenttracks['@attr'].totalPages;
         });
     }
   };
 
-  const parseData = (fetchData) => {
-    // const data = data.concat(fetchData);
-    // data.concat()
-
-    let newData = [];
-
-    for (let i = fetchData.length - 1; i >= 0; i--) {
-      newData.push({
-        key: toString(data.length+i),
-        artist: fetchData[i].artist['#text'],
-        name: fetchData[i].name,
-        date: fetchData[i].date['#text'],
-        image: fetchData[i].image[0]['#text'],
-      });
+  const fetchData = (pages) => {
+    const requests = [];
+    for (let i = 0; i < pages; i++) {
+      const url = GET_RECENT_TRACKS_ENDPOINT(username, from, to, i + 1);
+      requests.push(axios.get(url));
     }
 
-    // console.log('new data', newData)
-
-      const localData = data.concat(newData)
-      setData(localData);
-    
+    axios.all(requests).then(
+      axios.spread((...allData) => {
+        const tracks = allData.map((item) => item.data.recenttracks.track).flat();
+        const tracksParsed = tracks.map((item) => ({
+          image: item.image[0]['#text'],
+          date: item.date['#text'],
+          artist: item.artist['#text'],
+          name: item.name,
+          key: `${item.date['#text']}`,
+        }));
+        setData(tracksParsed);
+      })
+    );
   };
 
-  const getOnePage = (page) => {
-    const url = GET_RECENT_TRACKS_ENDPOINT(getUser(), from, to, page);
-    console.log(url);
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log(data);
-        // console.log(data.recenttracks.track);
-        parseData(data.recenttracks.track);
-        // console.log(data.recenttracks.track)
-      });
-  };
-
-  const getData = () => {
+  const getData = async (pages) => {
     setData([]);
-      for (let i = 0; i < pages; i++) {
-        getOnePage(i+1);
-      }
+    fetchData(pages);
   };
 
-  const getOnePageData = () => {
-    const url = GET_RECENT_TRACKS_ENDPOINT(getUser(), from, to);
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log(data);
-        console.log(data.recenttracks.track);
-        data = data.recenttracks.track;
-        let newData = [];
-
-        for (let i = data.length - 1; i >= 0; i--) {
-          newData.push({
-            key: toString(i),
-            artist: data[i].artist['#text'],
-            name: data[i].name,
-            date: data[i].date['#text'],
-            image: data[i].image[0]['#text'],
-          });
-        }
-
-        setData(newData);
-      });
-  };
-
-  useEffect(() => {
-    // getOnePageData();
-    getPages().then(() => getData());
+  useEffect(async () => {
+    const pages = await getPages();
+    getData(pages);
   }, [from, to]);
 
   const setDate = (v) => {
-    setIsLoading(true);
     setDateRange(v);
     try {
       setFrom(dateRange[0].format('X'));
       setTo(dateRange[1].format('X'));
-      //   getData();
     } catch (error) {
       setFrom('');
       setTo('');
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -233,9 +174,7 @@ const UserScreen = () => {
         </Button>
       </ButtonContainer>
       <SpotifyAuthButton />
-      {data ? data.length : null}
-      
-      {/* <DataContainer>
+      <DataContainer>
         {isLoading && <Spin />}
         {from && to && (
           <TextDateContainer>
@@ -244,9 +183,9 @@ const UserScreen = () => {
           </TextDateContainer>
         )}
         <ResultContainer>
-          <Table dataSource={data} columns={columns} /> 
+          <Table dataSource={data} columns={columns} />
         </ResultContainer>
-      </DataContainer> */}
+      </DataContainer>
     </Container>
   );
 };
