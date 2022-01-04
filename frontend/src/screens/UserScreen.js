@@ -119,13 +119,16 @@ const UserScreen = () => {
     axios.all(requests).then(
       axios.spread((...allData) => {
         const tracks = allData.map((item) => item.data.recenttracks.track).flat();
-        const tracksParsed = tracks.map((item) => ({
+        const tracksWithoutActive = tracks.filter((track) => !track['@attr']);
+        console.log('tracks', tracksWithoutActive);
+        const tracksParsed = tracksWithoutActive.map((item) => ({
           image: item.image[0]['#text'],
           date: item.date['#text'],
           artist: item.artist['#text'],
           name: item.name,
-          key: `${item.date['#text']}`,
+          key: `${item.date['#text']}${item.name}${item.artist['#text']}`,
         }));
+
         setData(tracksParsed);
       })
     );
@@ -153,40 +156,45 @@ const UserScreen = () => {
   };
 
   return (
-    <Container>
-      <GreetingContainer>{greetingText}</GreetingContainer>
-      <DatePickerContainer>
-        <Space direction="vertical" size={12}>
-          <RangePicker
-            disabledDate={(current) => {
-              let customDate = moment().format('YYYY-MM-DD');
-              return current && current > moment(customDate, 'YYYY-MM-DD');
-            }}
-            value={dateRange}
-            format={dateFormat}
-            onChange={(v) => setDateRange(v)}
-          />
-        </Space>
-      </DatePickerContainer>
-      <ButtonContainer>
-        <Button onClick={setDate} type="primary" ghost>
-          Date Range
-        </Button>
-      </ButtonContainer>
+    <>
       <SpotifyAuthButton />
-      <DataContainer>
-        {isLoading && <Spin />}
-        {from && to && (
-          <TextDateContainer>
-            <span style={{ color: 'blue' }}>{collectDateText}</span>
-            <i>{moment.unix(from).format('LL')}</i> - <i>{moment.unix(to).format('LL')}</i>
-          </TextDateContainer>
-        )}
-        <ResultContainer>
-          <Table dataSource={data} columns={columns} />
-        </ResultContainer>
-      </DataContainer>
-    </Container>
+      <Container>
+        <GreetingContainer>{greetingText}</GreetingContainer>
+        <DatePickerContainer>
+          <Space direction="vertical" size={12}>
+            <RangePicker
+              disabledDate={(current) => {
+                let customDate = moment().format('YYYY-MM-DD');
+                return current && current > moment(customDate, 'YYYY-MM-DD');
+              }}
+              value={dateRange}
+              format={dateFormat}
+              onChange={(v) => setDateRange(v)}
+            />
+          </Space>
+        </DatePickerContainer>
+        <ButtonContainer>
+          <Button onClick={setDate} type="primary" ghost>
+            Date Range
+          </Button>
+        </ButtonContainer>
+        <DataContainer>
+          {/* {isLoading && <Spin />} */}
+          {from && to && (
+            <>
+              <TextDateContainer>
+                <span style={{ color: '#0544AC' }}>{collectDateText}</span>
+                <i>{moment.unix(from).format('LL')}</i> - <i>{moment.unix(to).format('LL')}</i>
+              </TextDateContainer>
+
+              <ResultContainer>
+                <Table dataSource={data} columns={columns} />
+              </ResultContainer>
+            </>
+          )}
+        </DataContainer>
+      </Container>
+    </>
   );
 };
 
