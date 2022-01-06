@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { getUser } from '../components/Auth';
+import { getUser, setSpotiToken } from '../components/Auth';
 import { DatePicker, Space, Button, Spin, Table } from 'antd';
 import moment from 'moment';
 import { GET_RECENT_TRACKS_ENDPOINT } from '../consts/ApiUrls';
 import SpotifyAuthButton from '../components/SpotifyAuthButton';
 
 import axios from 'axios';
+import SpotifyPlaylistModal from '../components/SpotifyPlaylistModal';
 
 const Container = styled.div``;
 
@@ -24,7 +25,14 @@ const DatePickerContainer = styled.div`
   margin-top: 30px;
 `;
 
-const ButtonContainer = styled.div`
+const ButtonDateRangeContainer = styled.div`
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ButtonSpotifyCreatePlaylistContainer = styled.div`
   margin-top: 20px;
   display: flex;
   justify-content: center;
@@ -50,6 +58,10 @@ const Loading = styled.div`
   position: absolute;
   top: 67%;
   left: 47%;
+`;
+
+const DescriptionContainer = styled.div`
+  text-align: center;
 `;
 
 const { RangePicker } = DatePicker;
@@ -87,16 +99,19 @@ const columns = [
 ];
 
 const UserScreen = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [username, setUsername] = useState(getUser());
   const [dateRange, setDateRange] = useState([moment(), moment()]);
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
-  const [pages, setPages] = useState(0);
+  const [isRedirect, setIsRedirect] = useState(false);
+  const [isSpotiAuth, setIsSpotiAuth] = useState(false);
 
   const greetingText = `Hello ${username}`;
   const collectDateText = 'Collecting data: ';
+  const descriptionText = 'Create a spotify playlist from your musical periods.';
 
   const getPages = async () => {
     if (from && to) {
@@ -120,7 +135,6 @@ const UserScreen = () => {
       axios.spread((...allData) => {
         const tracks = allData.map((item) => item.data.recenttracks.track).flat();
         const tracksWithoutActive = tracks.filter((track) => !track['@attr']);
-        console.log('tracks', tracksWithoutActive);
         const tracksParsed = tracksWithoutActive.map((item) => ({
           image: item.image[0]['#text'],
           date: item.date['#text'],
@@ -128,6 +142,9 @@ const UserScreen = () => {
           name: item.name,
           key: `${item.date['#text']}${item.name}${item.artist['#text']}`,
         }));
+        // here add parsing algo
+        // on given threshold take one song from each artist and
+        // add to the list of tracks that will be added to create spotify playlist list
 
         setData(tracksParsed);
       })
@@ -138,6 +155,29 @@ const UserScreen = () => {
     setData([]);
     fetchData(pages);
   };
+
+  const getHashParams = () => {
+    var hashParams = {};
+    var e,
+      r = /([^&;=]+)=?([^&;]*)/g,
+      q = window.location.hash.substring(1);
+    while ((e = r.exec(q))) {
+      hashParams[e[1]] = decodeURIComponent(e[2]);
+    }
+    return hashParams;
+  };
+
+  const setSpotifyParams = () => {
+    const spotifyParams = getHashParams();
+    if (spotifyParams.access_token) {
+      setSpotiToken(spotifyParams.access_token);
+      setIsSpotiAuth(true);
+    }
+  };
+
+  useEffect(() => {
+    setSpotifyParams();
+  }, [isRedirect]);
 
   useEffect(async () => {
     const pages = await getPages();
@@ -157,9 +197,13 @@ const UserScreen = () => {
 
   return (
     <>
-      <SpotifyAuthButton />
+      <SpotifyPlaylistModal isModalVisible={isModalVisible} handleCancel={() => setIsModalVisible(false)} />
+      <SpotifyAuthButton isAuth={isSpotiAuth} setIsRedirect={setIsRedirect} />
       <Container>
         <GreetingContainer>{greetingText}</GreetingContainer>
+        <DescriptionContainer>
+          <p>{descriptionText}</p>
+        </DescriptionContainer>
         <DatePickerContainer>
           <Space direction="vertical" size={12}>
             <RangePicker
@@ -173,11 +217,16 @@ const UserScreen = () => {
             />
           </Space>
         </DatePickerContainer>
-        <ButtonContainer>
+        <ButtonDateRangeContainer>
           <Button onClick={setDate} type="primary" ghost>
             Date Range
           </Button>
-        </ButtonContainer>
+        </ButtonDateRangeContainer>
+        <ButtonSpotifyCreatePlaylistContainer>
+          <Button onClick={() => setIsModalVisible(true)} type="primary" ghost>
+            Create Spotify Playlist
+          </Button>
+        </ButtonSpotifyCreatePlaylistContainer>
         <DataContainer>
           {/* {isLoading && <Spin />} */}
           {from && to && (

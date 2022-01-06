@@ -1,8 +1,8 @@
 import { notification } from 'antd';
 
-const Notify = (message_type, desc) => {
+const Notify = (message_type, desc, duration = 1.5) => {
   notification.open({
-    duration: 1.5,
+    duration: duration,
     message: message_type,
     description: desc,
   });

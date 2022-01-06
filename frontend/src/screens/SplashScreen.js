@@ -75,13 +75,11 @@ const SplashScreen = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.message) {
-          console.log('wszedlem tu');
           Notify('Error', data.message);
           deleteUserData();
           return;
         }
         if (data.user.name) {
-          // Notify('Success', `User: ${data.user.name} Found`)
           setUserData(data.user.name);
           navigate('/user');
         }
