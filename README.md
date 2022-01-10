@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=FWS373XGLPLS6)
 
-musi-memo is a simple tool which can automate creating spotify playlist for you.
+musi-memo is a simple tool which can automate creating your spotify playlists
 
 ## How to use it
 
