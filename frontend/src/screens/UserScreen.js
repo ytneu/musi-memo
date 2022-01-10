@@ -10,6 +10,8 @@ import SpotifyAuthButton from '../components/SpotifyAuthButton';
 import axios from 'axios';
 import SpotifyPlaylistModal from '../components/SpotifyPlaylistModal';
 
+import _ from 'lodash';
+
 const Container = styled.div``;
 
 const GreetingContainer = styled.div`

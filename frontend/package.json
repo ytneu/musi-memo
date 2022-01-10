@@ -1,5 +1,6 @@
 {
-  "name": "antd-demo",
+  "name": "musi-memo",
+  "homepage": "http://ytneu.github.io/musi-memo",
   "version": "0.1.0",
   "proxy": "http://localhost:3000",
   "private": true,
@@ -26,7 +27,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
