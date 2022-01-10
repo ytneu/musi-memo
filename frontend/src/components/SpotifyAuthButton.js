@@ -19,7 +19,7 @@ const LinkContainer = styled.div``;
 const SpotifyAuthButton = ({ setIsRedirect, isAuth }) => {
   const REACT_APP_CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
   const REACT_APP_AUTHORIZE_URL = SPOTIFY_REDIRECT_URL;
-  const REACT_APP_REDIRECT_URL = 'http://localhost:3000/user';
+  const REACT_APP_REDIRECT_URL = SPOTIFY_REDIRECT_URL;
   var scope = 'playlist-modify-public playlist-modify-private';
 
   let navigate = useNavigate();
