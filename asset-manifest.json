@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/musi-memo/static/css/main.3a615e10.css",
+    "main.js": "/musi-memo/static/js/main.81180447.js",
+    "index.html": "/musi-memo/index.html",
+    "main.3a615e10.css.map": "/musi-memo/static/css/main.3a615e10.css.map",
+    "main.81180447.js.map": "/musi-memo/static/js/main.81180447.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3a615e10.css",
+    "static/js/main.81180447.js"
+  ]
+}
