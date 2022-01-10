@@ -1,16 +1,21 @@
-import { Modal, Form, Input, Checkbox } from 'antd';
-import { useState } from 'react';
+import { Modal, Form, Input, Checkbox, InputNumber } from 'antd';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SpotifyCreatePlaylistButton from './SpotifyCreatePlaylistButton';
 
 const Container = styled.div``;
-const FormContainer = styled.div``;
+const FormContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
-const SpotifyPlaylistModal = ({ isModalVisible, handleCancel }) => {
-  const [formData, setFormData] = useState({ name: '', desription: '', public: false });
+const SpotifyPlaylistModal = ({ isModalVisible, handleCancel, data }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(false);
+  const [playlistLength, setPlaylistLength] = useState(10);
+
   return (
     <Container>
       <Modal title="Create Playlist" footer={null} onCancel={handleCancel} centered={true} visible={isModalVisible}>
@@ -27,10 +32,6 @@ const SpotifyPlaylistModal = ({ isModalVisible, handleCancel }) => {
               remember: true,
             }}
             autoComplete="off"
-            // onValuesChange={
-            //   (values) => console.log(values)
-            //   setFormData({ name: values.name, description: values.description, public: values.public })
-            // }
           >
             <Form.Item
               label="Name"
@@ -50,6 +51,10 @@ const SpotifyPlaylistModal = ({ isModalVisible, handleCancel }) => {
               <Input />
             </Form.Item>
 
+            <Form.Item label="Length" name="length">
+              <InputNumber defaultValue={playlistLength} onChange={(num) => setPlaylistLength(num)} />
+            </Form.Item>
+
             <Form.Item
               name="public"
               valuePropName="checked"
@@ -67,7 +72,13 @@ const SpotifyPlaylistModal = ({ isModalVisible, handleCancel }) => {
                 span: 16,
               }}
             >
-              <SpotifyCreatePlaylistButton name={name} description={description} isPlaylistPublic={isPublic} />
+              <SpotifyCreatePlaylistButton
+                data={data}
+                name={name}
+                description={description}
+                playlistLength={playlistLength + 1}
+                isPlaylistPublic={isPublic}
+              />
             </Form.Item>
           </Form>
         </FormContainer>

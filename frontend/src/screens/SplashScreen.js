@@ -69,8 +69,6 @@ const SplashScreen = () => {
   const checkUserExists = (user) => {
     const url = ENDPOINT_NAME(GET_INFO, user);
 
-    console.log(url);
-
     fetch(url)
       .then((response) => response.json())
       .then((data) => {
@@ -87,7 +85,6 @@ const SplashScreen = () => {
   };
 
   const onClick = () => {
-    console.log(user);
     if (!user) {
       Notify('Error', 'Please fill username input.');
       return;

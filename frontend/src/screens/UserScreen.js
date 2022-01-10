@@ -106,6 +106,7 @@ const UserScreen = () => {
   const [to, setTo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [groupedData, setGroupedData] = useState([]);
   const [isRedirect, setIsRedirect] = useState(false);
   const [isSpotiAuth, setIsSpotiAuth] = useState(false);
 
@@ -142,11 +143,16 @@ const UserScreen = () => {
           name: item.name,
           key: `${item.date['#text']}${item.name}${item.artist['#text']}`,
         }));
-        // here add parsing algo
-        // on given threshold take one song from each artist and
-        // add to the list of tracks that will be added to create spotify playlist list
+
+        const groupedTracks = _(tracksParsed)
+          .groupBy((x) => x.artist)
+          .map((value, key) => ({ artist: key, songs: value }))
+          .sortBy('songs')
+          .reverse('songs')
+          .value();
 
         setData(tracksParsed);
+        setGroupedData(groupedTracks);
       })
     );
   };
@@ -197,7 +203,11 @@ const UserScreen = () => {
 
   return (
     <>
-      <SpotifyPlaylistModal isModalVisible={isModalVisible} handleCancel={() => setIsModalVisible(false)} />
+      <SpotifyPlaylistModal
+        data={groupedData}
+        isModalVisible={isModalVisible}
+        handleCancel={() => setIsModalVisible(false)}
+      />
       <SpotifyAuthButton isAuth={isSpotiAuth} setIsRedirect={setIsRedirect} />
       <Container>
         <GreetingContainer>{greetingText}</GreetingContainer>
@@ -222,11 +232,13 @@ const UserScreen = () => {
             Date Range
           </Button>
         </ButtonDateRangeContainer>
-        <ButtonSpotifyCreatePlaylistContainer>
-          <Button onClick={() => setIsModalVisible(true)} type="primary" ghost>
-            Create Spotify Playlist
-          </Button>
-        </ButtonSpotifyCreatePlaylistContainer>
+        {data.length > 0 && (
+          <ButtonSpotifyCreatePlaylistContainer>
+            <Button onClick={() => setIsModalVisible(true)} type="primary" ghost>
+              Create Spotify Playlist
+            </Button>
+          </ButtonSpotifyCreatePlaylistContainer>
+        )}
         <DataContainer>
           {/* {isLoading && <Spin />} */}
           {from && to && (

@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { spotify_app_client_id } from '../consts/ApiUrls';
 
+import { SPOTIFY_REDIRECT_URL } from '../consts/Deploy';
+
 const Container = styled.div`
   position: absolute;
   bottom: 85%;
@@ -15,8 +17,8 @@ const Container = styled.div`
 const LinkContainer = styled.div``;
 
 const SpotifyAuthButton = ({ setIsRedirect, isAuth }) => {
-  const REACT_APP_CLIENT_ID = spotify_app_client_id;
-  const REACT_APP_AUTHORIZE_URL = 'https://accounts.spotify.com/authorize';
+  const REACT_APP_CLIENT_ID = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
+  const REACT_APP_AUTHORIZE_URL = SPOTIFY_REDIRECT_URL;
   const REACT_APP_REDIRECT_URL = 'http://localhost:3000/user';
   var scope = 'playlist-modify-public playlist-modify-private';
 
