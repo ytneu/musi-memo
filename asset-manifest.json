@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/musi-memo/static/css/main.3a615e10.css",
-    "main.js": "/musi-memo/static/js/main.2c77d448.js",
+    "main.js": "/musi-memo/static/js/main.5d02d24f.js",
     "index.html": "/musi-memo/index.html",
     "main.3a615e10.css.map": "/musi-memo/static/css/main.3a615e10.css.map",
-    "main.2c77d448.js.map": "/musi-memo/static/js/main.2c77d448.js.map"
+    "main.5d02d24f.js.map": "/musi-memo/static/js/main.5d02d24f.js.map"
   },
   "entrypoints": [
     "static/css/main.3a615e10.css",
-    "static/js/main.2c77d448.js"
+    "static/js/main.5d02d24f.js"
   ]
 }
