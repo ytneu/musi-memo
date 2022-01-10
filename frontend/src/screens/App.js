@@ -7,7 +7,7 @@ import UserScreen from './UserScreen';
 
 const App = () => {
   return (
-    <Router>
+    <Router basename={process.env.PUBLIC_URL}>
       <Routes>
         <Route exact path="/" element={<SplashScreen />} />
         <Route path="/" element={<ProtectedRoute />}>
